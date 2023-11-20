@@ -17,4 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/reactApp
+/reactApp/node_modules
+/reactApp/dist
+/reactApp/dist-ssr
+

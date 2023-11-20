@@ -7,11 +7,12 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function Signup(SignupRequest $request) {
+    public function Signup(SignupRequest $request)
+    {
         $data = $request -> Validated();
         $user = User::create([
             'name' => $data['name'],
@@ -22,10 +23,23 @@ class AuthController extends Controller
         $token = $user -> createToken('main') -> plainTextToken;
         return response(compact('user', 'token'));
     }
-    public function Login(LoginRequest $request) {
-
+    public function Login(LoginRequest $request)
+    {
+        $credentials = $request -> validated();
+        if (!Auth::attempt($credentials)) {
+            return response(
+                ['message' => 'provided email address or password is incorrect']
+            );
+        }
+        /** @var User $user */
+        $user = Auth::user();
+        $token = $user-> createToken('main')->plainTextToken;
+        return response(compact('user', 'token'));
     }
-    public function Logout(Request $request) {
-
+    public function Logout(Request $request)
+    {
+        $user = $request-> user();
+        $user -> currentAccessToken()->delete();
+        return response('', 204);
     }
 }
